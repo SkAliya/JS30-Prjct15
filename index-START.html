@@ -66,90 +66,89 @@
       const addItems = document.querySelector(".add-items");
       const itemsList = document.querySelector(".plates");
       const inpValue = document.querySelector("input[name=item]");
+      // if localst have items then assign to items if not empty arr
+      let items = JSON.parse(localStorage.getItem("items")) || [];
 
-      let items = [];
-      // localStorage.clear();
       function addItem(e) {
-        const lis = document.querySelectorAll(".plates > li");
-        console.log(lis.length);
-        const inp = e.target;
-        console.log(inp);
-        //inp part
-        if (inp.type === "submit") {
-          if (inpValue.value !== "") {
-            let html = `<li>
-              <input type="checkbox" name='newItem${
-                lis.length + 1
-              }' id="newItem${lis.length + 1}">
-              <label for='newItem${lis.length + 1}'> ${inpValue.value}</label>
-             </li>`;
-            itemsList.innerHTML += html;
-            localStorage.setItem(`newItem${lis.length + 1}`, inpValue.value);
-            // items.push(inpValue.value);
-          }
-
-          // items.forEach((item, i) => {
-          //   localStorage.setItem(`item${i + 1}`, item);
-          // });
-        }
-        inpValue.value = "";
+        e.preventDefault();
+        //getting inp txtvalue
+        inpTxt = this.firstElementChild.value;
+        const item = { inpTxt, done: false };
+        //add to arr
+        items.push(item);
+        console.log(items);
+        localStorage.setItem("items", JSON.stringify(items));
+        showItems(items, itemsList);
+        this.reset();
+      }
+      //adding new items to ul list
+      function showItems(arrItems = [], ulList) {
+        ulList.innerHTML = arrItems
+          .map((item, i) => {
+            return `
+            <li>
+              <input type='checkbox' data-index=${i} id='item${i}' ${
+              item.done ? "checked" : ""
+            }>
+              <label for='item${i}'>${item.inpTxt}</label>
+              </li>
+            `;
+          })
+          .join("");
+        // console.log(ulList);
       }
 
-      wrapper.addEventListener("click", addItem);
-
-      for (let i = 0; i < localStorage.length; i++) {
-        itemsList.innerHTML += `<li>
-          <input type="checkbox" id="${localStorage.key(
-            i
-          )}" name='${localStorage.key(i)}'>
-              <label for='${localStorage.key(i)}'> ${localStorage.getItem(
-          localStorage.key(i)
-        )}</label>
-          </li>`;
+      //updating  input checked
+      function checkChanged(e) {
+        if (!e.target.matches("input")) return;
+        const inpEle = e.target;
+        const index = inpEle.dataset.index;
+        items[index].done = !items[index].done;
+        localStorage.setItem("items", JSON.stringify(items));
+        showItems(items, itemsList);
       }
-      // console.log(lis);
+      addItems.addEventListener("submit", addItem);
+      itemsList.addEventListener("click", checkChanged);
+      //displaying old items those stored in local storege if any there by defult
+      showItems(items, itemsList);
     </script>
   </body>
 </html>
-<!-- const addItems = document.querySelector('.add-items');
-const itemsList = document.querySelector('.plates');
-const items = JSON.parse(localStorage.getItem('items')) || [];
+<!-- // // localStorage.clear();
+// function addItem(e) {
+//   const lis = document.querySelectorAll(".plates > li");
+//   console.log(lis.length);
+//   const inp = e.target;
+//   console.log(inp);
+//   //inp part
+//   if (inp.type === "submit") {
+//     if (inpValue.value !== "") {
+//       let html = `<li>
+//         <input type="checkbox" name='newItem${
+//           lis.length + 1
+//         }' id="newItem${lis.length + 1}">
+//         <label for='newItem${lis.length + 1}'> ${inpValue.value}</label>
+//        </li>`;
+//       itemsList.innerHTML += html;
+//       localStorage.setItem(`newItem${lis.length + 1}`, inpValue.value);
+//       // items.push(inpValue.value);
+//     }
 
-function addItem(e) {
-  e.preventDefault();
-  const text = (this.querySelector('[name=item]')).value;
-  const item = {
-    text,
-    done: false
-  };
+//     // items.forEach((item, i) => {
+//     //   localStorage.setItem(`item${i + 1}`, item);
+//     // });
+//   }
+//   inpValue.value = "";
+// }
 
-  items.push(item);
-  populateList(items, itemsList);
-  localStorage.setItem('items', JSON.stringify(items));
-  this.reset();
-}
-
-function populateList(plates = [], platesList) {
-  platesList.innerHTML = plates.map((plate, i) => {
-    return `
-      <li>
-        <input type="checkbox" data-index=${i} id="item${i}" ${plate.done ? 'checked' : ''} />
-        <label for="item${i}">${plate.text}</label>
-      </li>
-    `;
-  }).join('');
-}
-
-function toggleDone(e) {
-  if (!e.target.matches('input')) return; // skip this unless it's an input
-  const el = e.target;
-  const index = el.dataset.index;
-  items[index].done = !items[index].done;
-  localStorage.setItem('items', JSON.stringify(items));
-  populateList(items, itemsList);
-}
-
-addItems.addEventListener('submit', addItem);
-itemsList.addEventListener('click', toggleDone);
-
-populateList(items, itemsList); -->
+// for (let i = 0; i < localStorage.length; i++) {
+//   itemsList.innerHTML += `<li>
+//     <input type="checkbox" id="${localStorage.key(
+//       i
+//     )}" name='${localStorage.key(i)}'>
+//     <label for='${localStorage.key(i)}'> ${localStorage.getItem(
+//       localStorage.key(i)
+//     )}</label>
+//     </li>`;
+//   }
+// wrapper.addEventListener("click", addItem); -->
